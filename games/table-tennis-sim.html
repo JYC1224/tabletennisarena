@@ -1,0 +1,545 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#071a23">
+  <meta name="description" content="2.5D 桌球對戰：選擇真實型號底板與正反手膠皮，以旋轉、落點、步法和擊球時機打完整個 11 分制單打比賽。">
+  <title>桌球競技場｜2.5D 戰術對戰</title>
+  <style>
+    :root { color-scheme: dark; --bg:#071a23; --panel:#102b35; --panel2:#173943; --line:#31535b; --text:#f2f4e9; --muted:#adc2c0; --mint:#9ef5d3; --gold:#f5d58b; --coral:#ff9b84; --blue:#90cffa; }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body { margin:0; min-width:320px; color:var(--text); background:radial-gradient(circle at 20% 0%,#1b4b4d 0,transparent 38%),radial-gradient(circle at 100% 70%,#1b3149 0,transparent 30%),var(--bg); font-family:"Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif; }
+    button,select { font:inherit; }
+    button { cursor:pointer; }
+    a { color:var(--mint); }
+    .wrap { width:min(1320px,100%); margin:auto; padding:20px; }
+    .top { display:flex; align-items:center; justify-content:space-between; gap:18px; margin-bottom:16px; }
+    .kicker { color:var(--mint); font-size:.72rem; font-weight:900; letter-spacing:.18em; text-transform:uppercase; }
+    h1 { margin:4px 0 2px; font-size:clamp(1.45rem,3vw,2.2rem); line-height:1.12; letter-spacing:-.04em; }
+    .intro { margin:0; color:var(--muted); font-size:.85rem; }
+    .scorebox { display:flex; align-items:center; gap:12px; padding:10px 15px; border:1px solid var(--line); border-radius:17px; background:#0b2630; box-shadow:0 12px 30px #0003; }
+    .scorebox .side { min-width:50px; text-align:center; }
+    .scorebox span { display:block; font-size:.68rem; color:var(--muted); font-weight:800; }
+    .scorebox strong { display:block; font-size:1.9rem; line-height:1.1; font-variant-numeric:tabular-nums; }
+    #score-player { color:var(--blue); } #score-ai { color:var(--coral); }
+    .scorebox b { color:var(--gold); font-size:.8rem; }
+    .layout { display:grid; grid-template-columns:minmax(0,1.6fr) minmax(300px,.85fr); gap:16px; align-items:start; }
+    .stage,.panel { border:1px solid var(--line); border-radius:18px; background:linear-gradient(145deg,#12343d,#0c2630); box-shadow:0 14px 42px #0003; overflow:hidden; }
+    .stage-head { display:flex; justify-content:space-between; align-items:center; gap:10px; padding:12px 15px; color:var(--muted); font-size:.77rem; font-weight:800; }
+    .badge { padding:5px 9px; border:1px solid #598a81; border-radius:999px; color:var(--mint); background:#173f40; white-space:nowrap; }
+    .canvas-wrap { position:relative; width:100%; background:#071925; }
+    canvas { display:block; width:100%; height:auto; aspect-ratio:920 / 570; touch-action:none; }
+    .live { display:flex; justify-content:space-between; align-items:center; gap:12px; min-height:65px; padding:10px 16px; border-top:1px solid var(--line); }
+    #message { font-size:.91rem; font-weight:850; }
+    #hint { display:block; margin-top:3px; color:var(--muted); font-size:.7rem; font-weight:500; line-height:1.4; }
+    #spin-read { color:var(--gold); font-size:.76rem; text-align:right; white-space:nowrap; }
+    .panel { padding:16px; margin-bottom:15px; }
+    .panel h2 { margin:0 0 4px; font-size:1rem; }
+    .panel p { margin:0 0 12px; color:var(--muted); font-size:.75rem; line-height:1.5; }
+    .section-title { display:flex; justify-content:space-between; align-items:center; gap:8px; margin:14px 0 8px; color:var(--mint); font-size:.73rem; font-weight:900; letter-spacing:.06em; }
+    .shot-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:7px; }
+    .control { min-height:45px; padding:7px 5px; border:1px solid #49656a; border-radius:10px; color:var(--text); background:#193b43; text-align:center; font-weight:800; font-size:.76rem; transition:transform .12s,background .12s,border-color .12s; }
+    .control:hover,.placement:hover { transform:translateY(-1px); border-color:var(--mint); }
+    .control.selected,.placement.selected { border-color:var(--mint); color:#092d33; background:var(--mint); }
+    .control small { display:block; margin-top:2px; opacity:.7; font-size:.63rem; font-weight:700; }
+    .placement-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; }
+    .placement { min-height:40px; border:1px solid #49656a; border-radius:9px; background:#1a3b43; color:var(--text); font-size:.75rem; font-weight:800; }
+    .hit { width:100%; margin-top:14px; min-height:55px; border:0; border-radius:12px; background:linear-gradient(125deg,#f5d58b,#e8a96f); color:#30281a; font-size:1.05rem; font-weight:950; box-shadow:0 7px 0 #a07344; }
+    .hit:active { transform:translateY(5px); box-shadow:0 2px 0 #a07344; }
+    .micro { margin:11px 0 0 !important; font-size:.68rem !important; }
+    .gear-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .gear-grid label:first-child { grid-column:span 2; }
+    label { display:block; color:var(--muted); font-size:.7rem; font-weight:850; }
+    select { display:block; width:100%; margin-top:5px; padding:10px; border:1px solid #517078; border-radius:9px; color:var(--text); background:#12333c; font-size:.75rem; }
+    option { color:#102b35; }
+    .gear-note { margin:10px 0 0 !important; min-height:35px; }
+    .metrics { display:grid; grid-template-columns:repeat(2,1fr); gap:7px 12px; margin-top:11px; }
+    .metric { font-size:.69rem; }
+    .metric-line { display:flex; justify-content:space-between; margin-bottom:3px; color:var(--muted); }
+    .bar { height:5px; overflow:hidden; border-radius:999px; background:#33515a; }
+    .bar i { display:block; height:100%; background:linear-gradient(90deg,#69c2ca,#c9f5b3); border-radius:inherit; }
+    .tiny { color:var(--muted); font-size:.66rem; line-height:1.5; }
+    details { margin-top:11px; padding:10px 12px; border:1px solid var(--line); border-radius:9px; background:#102e36; }
+    summary { cursor:pointer; color:var(--mint); font-size:.75rem; font-weight:850; }
+    details p,details li { color:var(--muted); font-size:.69rem; line-height:1.55; }
+    details ul { margin:8px 0 0; padding-left:18px; }
+    .footer { display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-top:12px; color:#99b7b9; font-size:.67rem; }
+    .footer button { border:0; padding:0; color:var(--mint); background:transparent; text-decoration:underline; font-size:inherit; }
+    .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+    @media(max-width:950px) { .layout { grid-template-columns:1fr; } .wrap { padding:12px; } .side-panels { display:grid; grid-template-columns:1fr 1fr; gap:12px; } .panel { margin:0; } }
+    @media(max-width:680px) { .top { align-items:flex-start; } .scorebox { gap:5px; padding:6px 8px; } .scorebox .side { min-width:35px; } .scorebox strong { font-size:1.35rem; } .scorebox b { font-size:.65rem; } .side-panels { display:block; } .panel { margin-bottom:12px; } .shot-grid { grid-template-columns:repeat(3,1fr); } .intro { max-width:240px; } }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header class="top">
+      <div><div class="kicker">TABLE TENNIS / 2.5D SIMULATION</div><h1>桌球競技場</h1><p class="intro">選器材、讀旋轉、搶落點。打一場真正有發接發與相持的單打。</p></div>
+      <div class="scorebox" aria-label="比分"><div class="side"><span>你</span><strong id="score-player">0</strong></div><b>11 分制</b><div class="side"><span>對手</span><strong id="score-ai">0</strong></div></div>
+    </header>
+    <div class="layout">
+      <section class="stage" aria-label="2.5D 桌球球檯">
+        <div class="stage-head"><span id="turn-label">你發球 · 0 : 0</span><span class="badge" id="phase-label">準備發球</span></div>
+        <div class="canvas-wrap"><canvas id="court" width="920" height="570" aria-label="以斜視角呈現的桌球對戰畫面；移動滑鼠或觸控可移動球拍"></canvas></div>
+        <div class="live"><div><div id="message" role="status">選好球路，按「發球」開始。</div><span id="hint">球拍對準來球，等球在己方落台後按空白鍵或擊球鍵。</span></div><div id="spin-read">來球：待發</div></div>
+      </section>
+      <aside class="side-panels">
+        <section class="panel" aria-label="戰術與操作">
+          <h2>戰術操作</h2><p>先選擊球方式與落點；球落在你的半檯後抓時機擊球。</p>
+          <div class="section-title"><span>01 / 擊球方式</span><span>鍵盤 1–6</span></div>
+          <div class="shot-grid" id="shots">
+            <button class="control" data-shot="push">搓球<small>下旋短球 · 1</small></button>
+            <button class="control" data-shot="block">擋球<small>借力防守 · 2</small></button>
+            <button class="control" data-shot="drive">快帶<small>快速平擊 · 3</small></button>
+            <button class="control selected" data-shot="loop">弧圈<small>強上旋 · 4</small></button>
+            <button class="control" data-shot="side">側旋<small>曲線變向 · 5</small></button>
+            <button class="control" data-shot="smash">扣殺<small>高球終結 · 6</small></button>
+          </div>
+          <div class="section-title"><span>02 / 預定落點</span><span>對方半檯</span></div>
+          <div class="placement-grid" id="placements">
+            <button class="placement" data-x="-0.55" data-depth="1.04">左長</button><button class="placement" data-x="0" data-depth="1.04">中長</button><button class="placement selected" data-x="0.55" data-depth="1.04">右長</button>
+            <button class="placement" data-x="-0.52" data-depth="0.40">左短</button><button class="placement" data-x="0" data-depth="0.40">中短</button><button class="placement" data-x="0.52" data-depth="0.40">右短</button>
+          </div>
+          <button class="hit" id="hit">發球 / 擊球 <span aria-hidden="true">↗</span></button>
+          <p class="micro">滑鼠／觸控移動球拍；點擊球檯或按空白鍵擊球。← → / A D 移動，Q E 改變落點。發球時，搓球打下旋、側旋打側旋，其餘球法調整上旋量。</p>
+        </section>
+        <section class="panel" aria-label="器材配置">
+          <h2>我的球拍</h2><p>底板決定速度與手感；正反手膠皮分開選，會改變擊球數值與容錯。</p>
+          <div class="gear-grid">
+            <label>底板<select id="blade"></select></label>
+            <label>正手膠皮<select id="fh"></select></label>
+            <label>反手膠皮<select id="bh"></select></label>
+          </div>
+          <div class="section-title"><span id="active-rubber">目前預覽：正手</span><span id="gear-side">FH</span></div>
+          <div class="metrics" id="metrics"></div>
+          <p class="gear-note" id="gear-note"></p>
+          <div class="gear-grid"><label>電腦對手<select id="difficulty"><option value="training">練習賽 · 較慢腳步</option><option value="club">俱樂部賽 · 積極搶攻</option></select></label></div>
+          <details id="rules"><summary>規則、器材來源與模擬說明</summary>
+            <p>單打採 11 分、領先 2 分獲勝；每 2 分交換發球，10:10 後每分換發。發球須先落己方，再過網落對方；回球須在己方落台後、第二次落地前打出。發球擦網且合法落台則重發。</p>
+            <p>球檯 2.74 × 1.525 m、網高 15.25 cm，依 <a href="https://db.ittf.com/sites/default/files/public/2026-02/2026_Statutes_v1_consolidated_clean.pdf" target="_blank" rel="noopener">ITTF 2026 規則</a>。畫面與旋轉、反彈是 2.5D 遊戲化模型，未模擬完整空氣動力學、人體擊球動作與裁判細則。</p>
+            <p>下列型號與特性來自品牌官方頁面；遊戲內 0–100 數值是依其文字描述設計的相對值，並非跨品牌實測值。</p>
+            <ul>
+              <li>Butterfly：<a href="https://shop.butterflyonline.com/viscaria-blade-7669p" target="_blank" rel="noopener">Viscaria</a>、<a href="https://shop.butterflyonline.com/tenergy-05" target="_blank" rel="noopener">Tenergy 05</a></li>
+              <li>Nittaku：<a href="https://www.nittaku.com/products/rackets/post-39" target="_blank" rel="noopener">Acoustic</a>、<a href="https://www.nittaku.com/products/rubbers/post-3" target="_blank" rel="noopener">Fastarc G-1</a></li>
+              <li>JOOLA：<a href="https://joola.com/collections/premium-table-tennis-blades/products/vyzaryz-freeze-hrd-table-tennis-blade" target="_blank" rel="noopener">Vyzaryz Freeze HRD</a>、<a href="https://joola.com/products/dynaryz-agr-table-tennis-rubber" target="_blank" rel="noopener">Dynaryz AGR</a></li>
+              <li>DONIC：<a href="https://www.donic.com/en/DONIC-WALDNER-SENSO-CARBON/100219010" target="_blank" rel="noopener">Waldner Senso Carbon</a>、<a href="https://www.donic.com/en/DONIC-BLUEGRIP-C2/000241125" target="_blank" rel="noopener">BlueGrip C2</a></li>
+              <li>STIGA：<a href="https://www.stigasports.com/en/product/clipper-wood" target="_blank" rel="noopener">Clipper Wood</a>、<a href="https://www.stigasports.com/en/product/dna-platinum-h" target="_blank" rel="noopener">DNA Platinum H</a></li>
+            </ul>
+          </details>
+        </section>
+      </aside>
+    </div>
+    <div class="footer"><span>戰術提示：上旋拉開下旋；對方站偏一側時打空檔，短球能迫使對方上步。</span><button id="restart">重新開始比賽</button></div>
+  </main>
+  <script>
+  (() => {
+    "use strict";
+    const L = 2.74, W = 1.525, NET = .1525, R = .02, G = 9.81;
+    const blades = [
+      {id:"viscaria",name:"Butterfly Viscaria",speed:.87,control:.70,dwell:.69,note:"5 木 + 2 ALC；彈性、減震與攻擊速度的平衡。"},
+      {id:"acoustic",name:"Nittaku Acoustic",speed:.70,control:.88,dwell:.89,note:"5 層木與弦樂器製法；持球感與台內控制。"},
+      {id:"freeze",name:"JOOLA Vyzaryz Freeze HRD",speed:.93,control:.62,dwell:.59,note:"外置 ARY-C 與 Koto 面材；直接、強力的進攻。"},
+      {id:"waldner",name:"DONIC Waldner Senso Carbon",speed:.77,control:.83,dwell:.79,note:"7 層含碳結構；速度與控制兼顧。"},
+      {id:"clipper",name:"STIGA Clipper Wood",speed:.81,control:.74,dwell:.72,note:"7 層純木攻擊底板；強調擊球力量。"}
+    ];
+    const rubbers = [
+      {id:"tenergy",name:"Butterfly Tenergy 05",speed:.84,spin:.85,control:.70,throw:.78,note:"上旋弧線與 Spring Sponge 彈性。"},
+      {id:"fastarc",name:"Nittaku Fastarc G-1",speed:.77,spin:.87,control:.77,throw:.80,note:"高抓球與穩定弧線，適合旋轉相持。"},
+      {id:"dynaryz",name:"JOOLA Dynaryz AGR",speed:.91,spin:.82,control:.62,throw:.68,note:"硬海綿與高彈性，適合積極搶攻。"},
+      {id:"bluegrip",name:"DONIC BlueGrip C2",speed:.83,spin:.94,control:.59,throw:.83,note:"黏性表面與強旋轉，台內接發有優勢。"},
+      {id:"dna",name:"STIGA DNA Platinum H",speed:.90,spin:.85,control:.61,throw:.74,note:"硬海綿與高抓力，著重力量和弧圈。"}
+    ];
+    const shotNames = {push:"搓球",block:"擋球",drive:"快帶",loop:"弧圈",side:"側旋",smash:"扣殺"};
+    const $ = id => document.getElementById(id);
+    const cvs = $("court"), ctx = cvs.getContext("2d");
+    const g = {phase:"ready",p:0,ai:0,server:0,playerX:0,aiX:0,ball:null,shot:"loop",aimX:.55,depth:1.04,pending:0,pointTimer:0,aiServeTimer:0,tossT:0,tossSide:0,toast:"選好球路，按「發球」開始。",hint:"球拍對準來球，等球在己方落台後按空白鍵或擊球鍵。",last:performance.now(),keys:new Set(),flash:0,hitX:0,hitZ:0};
+    const clamp = (v,a,b) => Math.min(b,Math.max(a,v));
+    const rand = (a,b) => a + Math.random() * (b-a);
+    const fmt = n => Math.round(n*100);
+    const pick = (arr,id) => arr.find(x => x.id===id) || arr[0];
+    const gear = () => ({blade:pick(blades,$("blade").value),fh:pick(rubbers,$("fh").value),bh:pick(rubbers,$("bh").value)});
+    const compound = (blade,rubber) => ({
+      power:.55*blade.speed+.45*rubber.speed,
+      spin:rubber.spin*(.70+.30*blade.dwell),
+      control:.43*blade.control+.44*rubber.control+.13*blade.dwell,
+      arc:.58*rubber.throw+.42*blade.dwell
+    });
+    function fillSelect(id,items,selected) {
+      $(id).innerHTML = items.map(v => '<option value="'+v.id+'">'+v.name+'</option>').join("");
+      $(id).value = selected;
+    }
+    function loadGear() {
+      let saved={};
+      try { saved=JSON.parse(localStorage.getItem("tt-sim-gear")||"{}"); } catch(e) {}
+      fillSelect("blade",blades,saved.blade||"acoustic");
+      fillSelect("fh",rubbers,saved.fh||"fastarc");
+      fillSelect("bh",rubbers,saved.bh||"tenergy");
+      $("difficulty").value = saved.difficulty==="club"?"club":"training";
+      updateGear();
+    }
+    function updateGear(side) {
+      const eq=gear(), hand=side||((g.ball && g.ball.returnSide===0 && g.ball.x < g.playerX)?"bh":"fh");
+      const rubber=eq[hand], stat=compound(eq.blade,rubber);
+      $("active-rubber").textContent="目前預覽："+(hand==="fh"?"正手":"反手");
+      $("gear-side").textContent=hand.toUpperCase();
+      $("gear-note").textContent=eq.blade.note+" "+rubber.note;
+      const items=[["球速",stat.power],["旋轉",stat.spin],["容錯",stat.control],["弧線",stat.arc]];
+      $("metrics").innerHTML=items.map(pair => '<div class="metric"><div class="metric-line"><span>'+pair[0]+'</span><strong>'+fmt(pair[1])+'</strong></div><div class="bar"><i style="width:'+fmt(pair[1])+'%"></i></div></div>').join("");
+      try { localStorage.setItem("tt-sim-gear",JSON.stringify({blade:$("blade").value,fh:$("fh").value,bh:$("bh").value,difficulty:$("difficulty").value})); } catch(e) {}
+    }
+    function setMessage(title,detail) { g.toast=title; g.hint=detail||""; $("message").textContent=title; $("hint").textContent=g.hint; }
+    function serverForScore() {
+      const total=g.p+g.ai;
+      return g.p>=10 && g.ai>=10 ? total%2 : Math.floor(total/2)%2;
+    }
+    function updateHud() {
+      $("score-player").textContent=g.p;
+      $("score-ai").textContent=g.ai;
+      $("turn-label").textContent=(g.server===0?"你發球":"對手發球")+" · "+g.p+" : "+g.ai;
+      $("phase-label").textContent=g.phase==="ready"?(g.server===0?"準備發球":"準備接發"):g.phase==="toss"?"拋球中":g.phase==="rally"?"對戰中":g.phase==="point"?"本分結束":"比賽結束";
+      $("hit").textContent=g.phase==="ready"&&g.server===0?"發球 ↗":"擊球 ↗";
+      const b=g.ball;
+      const spin=b ? (b.spin>.35?"上旋":b.spin<-.35?"下旋":"近乎無旋")+(Math.abs(b.sideSpin)>.38?"＋側旋":"") : "待發";
+      $("spin-read").textContent="來球："+spin;
+    }
+    function resetPoint() {
+      g.server=serverForScore(); g.phase="ready"; g.ball=null; g.pending=0; g.aiServeTimer=g.server===1?1.0:0;
+      setMessage(g.server===0?"輪到你發球":"準備接發球",g.server===0?"選旋轉與落點，再按發球。":"觀察旋轉，移動球拍到預測落點。");
+      updateHud();
+    }
+    function resetMatch() {
+      if (g.pointTimer) clearTimeout(g.pointTimer);
+      g.p=0; g.ai=0; g.playerX=0; g.aiX=0; g.phase="ready"; g.ball=null; g.pending=0; resetPoint();
+    }
+    function point(winner,reason) {
+      if (g.phase!=="rally") return;
+      g.phase="point"; g.ball=null; g.pending=0; g.flash=1;
+      if (winner===0) g.p++; else g.ai++;
+      const done=Math.max(g.p,g.ai)>=11 && Math.abs(g.p-g.ai)>=2;
+      setMessage((winner===0?"你得分！":"對手得分。")+" "+reason,done?(winner===0?"拿下這局！":"再調整球路與站位，下一局見。"):"下一分即將開始。");
+      if (done) { g.phase="over"; } else { g.pointTimer=setTimeout(resetPoint,1450); }
+      updateHud();
+    }
+    function letServe() {
+      g.phase="ready"; g.ball=null; g.pending=0; g.aiServeTimer=g.server===1 ? .85 : 0;
+      setMessage("發球擦網，重發。","比分不變。");
+      updateHud();
+    }
+    function serve(side) {
+      if (g.phase!=="ready" || g.server!==side) return;
+      g.phase="toss";g.tossT=0;g.tossSide=side;
+      setMessage(side===0?"向上拋球…":"對手拋球…","球垂直上拋後開始發球；注意第一次落台。");
+      updateHud();
+    }
+    function serveShot(side) {
+      const short=side===0?g.depth<.7:Math.random()<.28;
+      const depth=short ? .4 : 1.04;
+      const eq=gear(),stat=side===0?compound(eq.blade,eq.fh):{power:.81,spin:.82,control:.74};
+      const speed=(short ? 2.45 : 4.15)*(.94+.08*stat.power);
+      const startX=side===0?g.playerX:g.aiX;
+      const aim=side===0?g.aimX:(g.playerX>.05?-.52:.52);
+      const targetX=aim+rand(-.13*(1-stat.control),.13*(1-stat.control));
+      const t0=.60/speed;
+      const vy=(R-.31+.5*G*t0*t0)/t0;
+      const travel=(1.18+depth)/speed;
+      const serveSpin={push:-.95,block:-.08,drive:.27,loop:.72,side:.18,smash:.03};
+      const incomingSpin=(side===0?serveSpin[g.shot]:(Math.random()<.35?-.92:.65))*(.70+.42*stat.spin);
+      const sideSpin=(side===0?(g.shot==="side"?(targetX>=0 ? .85 : -.85):0):(Math.random()<.3?rand(-.8,.8):0))*(.70+.42*stat.spin);
+      g.ball={x:startX*.86,z:side===0?1.18:-1.18,y:.31,vx:(targetX-startX*.86)/travel,vy:vy,vz:side===0?-speed:speed,spin:incomingSpin,sideSpin:sideSpin,hitter:side,serve:true,stage:0,expected:side,returnSide:null,serveDepth:depth,netTouched:false,trail:[]};
+      g.phase="rally"; g.pending=0;
+      setMessage(side===0?"發球出手！":"對手發球！","觀察第一次落台與旋轉，準備接發。");
+      updateHud();
+    }
+    function shotParams(name) {
+      return {
+        push:{speed:3.15,spin:-1.05,side:0,clear:.065},
+        block:{speed:4.35,spin:-.18,side:0,clear:.050},
+        drive:{speed:4.85,spin:.30,side:0,clear:.070},
+        loop:{speed:4.20,spin:1.28,side:0,clear:.120},
+        side:{speed:3.9,spin:.18,side:1.15,clear:.085},
+        smash:{speed:6.0,spin:.08,side:0,clear:.025}
+      }[name];
+    }
+    function launch(side,name,targetX,depth,stat,quality) {
+      const b=g.ball, prm=shotParams(name), incoming=b.spin;
+      const pushMismatch=(incoming<-.35 && (name==="drive"||name==="block"||name==="smash"))?Math.abs(incoming)*.12:0;
+      const smRisk=name==="smash"&&b.y<.28 ? .13 : 0;
+      let error=(1-stat.control)*.21+(1-quality)*.24+pushMismatch+smRisk;
+      if (side===1) error*=1.10;
+      let tx=targetX+rand(-error,error), td=depth+rand(-error*.85,error*.85);
+      if (side===1 && Math.random() < (quality<.52 ? .23 : .045)) tx += rand(-.35,.35);
+      td=clamp(td,.18,1.58); tx=clamp(tx,-1.10,1.10);
+      const targetZ=side===0?-td:td;
+      const distance=Math.abs(targetZ-b.z);
+      const power=stat.power;
+      const v=prm.speed*(.83+.34*power)*(.9+.16*quality);
+      const spin=prm.spin*stat.spin;
+      const sideSpin=prm.side*stat.spin*(tx>=b.x?1:-1);
+      const gravity=G+1.0*spin;
+      let duration=distance/v;
+      let vy=(R-b.y+.5*gravity*duration*duration)/duration;
+      let crossing=Math.abs(b.z)/(distance||1)*duration;
+      let netY=b.y+vy*crossing-.5*gravity*crossing*crossing;
+      const minNet=NET+R+prm.clear+.034*(stat.arc-.5);
+      if (name!=="smash") {
+        while (netY<minNet && duration<.88) {
+          duration+=.018;
+          vy=(R-b.y+.5*gravity*duration*duration)/duration;
+          crossing=Math.abs(b.z)/(distance||1)*duration;
+          netY=b.y+vy*crossing-.5*gravity*crossing*crossing;
+        }
+      } else if (b.y<.3) {
+        vy-=.16;
+      }
+      if (pushMismatch) vy-=pushMismatch*.8;
+      const xAccel=.40*sideSpin;
+      b.vx=(tx-b.x-.5*xAccel*duration*duration)/duration;
+      b.vz=(targetZ-b.z)/duration;
+      b.vy=vy;
+      b.spin=spin; b.sideSpin=sideSpin;
+      b.hitter=side; b.serve=false; b.stage=0; b.expected=1-side; b.returnSide=null; b.netTouched=false;
+      g.flash=.45; g.hitX=b.x; g.hitZ=b.z;
+      g.pending=0;
+      setMessage((side===0?"你":"對手")+"打出"+shotNames[name]+"！",side===0?"落點與旋轉會影響對方站位。":"移向來球，等球在你的半檯落台。");
+      updateHud();
+    }
+    function canPlayerHit() {
+      const b=g.ball;
+      if (!b || g.phase!=="rally" || b.returnSide!==0) return false;
+      const hand=b.x<g.playerX?"bh":"fh",eq=gear(), stat=compound(eq.blade,eq[hand]);
+      return b.z>.15 && b.z<1.67 && b.y>.035 && b.y<.68 && Math.abs(b.x-g.playerX)<(.17+.20*stat.control);
+    }
+    function playerHit() {
+      if (!canPlayerHit()) return false;
+      const b=g.ball,hand=b.x<g.playerX?"bh":"fh",eq=gear(),stat=compound(eq.blade,eq[hand]);
+      const offset=Math.abs(b.x-g.playerX), timing=1-Math.abs(b.z-.9)/1.2;
+      const spinPenalty=b.spin<-.3&&g.shot==="smash" ? .17 : 0;
+      const quality=clamp(.45+.44*timing-.55*offset+stat.control*.17-spinPenalty,.20,1);
+      updateGear(hand);
+      launch(0,g.shot,g.aimX,g.depth,stat,quality);
+      return true;
+    }
+    function requestHit() {
+      if (g.phase==="over") { resetMatch(); return; }
+      if (g.phase==="ready") {
+        if (g.server===0) serve(0);
+        else setMessage("對手即將發球。","先移動球拍，準備接發。");
+        return;
+      }
+      if (g.phase==="rally" && !playerHit()) {
+        g.pending=.42;
+        setMessage("預備揮拍…","等球在己方落台、進入球拍範圍就會出手。");
+      }
+    }
+    function aiThink() {
+      const b=g.ball;
+      if (!b || b.returnSide!==1 || g.phase!=="rally") return;
+      const reach=$("difficulty").value==="club" ? .29 : .245;
+      if (b.z>-.14 || b.z< -1.67 || b.y>.67 || b.y<.03 || Math.abs(b.x-g.aiX)>reach) return;
+      const incoming= b.spin;
+      let name;
+      if (incoming<-.45) name=Math.random()<.55?"loop":"push";
+      else if (b.y>.42) name="smash";
+      else name=Math.random()<.30?"block":Math.random()<.72?"drive":"loop";
+      const side=$("difficulty").value==="club" ? .56 : .50;
+      const aim=g.playerX>0? -side:side;
+      const depth=Math.random()<.22 ? .38 : 1.04;
+      const skill=$("difficulty").value==="club" ? .77 : .62;
+      const quality=clamp(skill-Math.abs(b.x-g.aiX)*.3-(incoming<-.7&&name==="drive" ? .15 : 0),.25,.90);
+      launch(1,name,aim,depth,{power:.81,spin:.82,control:skill,arc:.75},quality);
+    }
+    function ballStep(dt) {
+      const b=g.ball;
+      if (!b || g.phase!=="rally") return;
+      const oldZ=b.z,oldY=b.y;
+      const gravity=G+1.0*b.spin;
+      b.vy-=gravity*dt;
+      b.vx+=.40*b.sideSpin*dt;
+      b.x+=b.vx*dt; b.y+=b.vy*dt; b.z+=b.vz*dt;
+      if ((oldZ>0 && b.z<=0) || (oldZ<0 && b.z>=0)) {
+        const f=oldZ/(oldZ-b.z), yNet=oldY+(b.y-oldY)*f;
+        if (b.serve && b.stage===0) { point(1-b.hitter,"發球未先落在己方。"); return; }
+        if (yNet<NET+R-.007) { point(1-b.hitter,"球掛網。"); return; }
+        if (yNet<NET+R+.016) b.netTouched=true;
+      }
+      if (b.y<=R && b.vy<0) {
+        if (Math.abs(b.x)<=W/2+R && Math.abs(b.z)<=L/2+R) {
+          const landed=b.z>=0?0:1;
+          if (b.returnSide!==null) { point(b.hitter,"對方來不及回擊。"); return; }
+          if (landed!==b.expected) { point(1-b.hitter,b.serve?"發球落錯半檯。":"回球落錯半檯。"); return; }
+          b.y=R;
+          if (b.serve && b.stage===0) {
+            b.stage=1; b.expected=1-b.hitter;
+            const travel=(.60+b.serveDepth)/Math.abs(b.vz);
+            b.vy=.5*(G+1.0*b.spin)*travel;
+            b.vz*=1+.055*b.spin;
+          } else {
+            if (b.serve && b.netTouched) { letServe(); return; }
+            b.stage=b.serve?2:1; b.returnSide=landed;
+            b.vy=Math.abs(b.vy)*(.72+.06*clamp(b.spin,-1,1));
+            b.vz*=.85+.10*clamp(b.spin,-1,1);
+            b.vx+=.30*b.sideSpin;
+            b.spin*=.76; b.sideSpin*=.65;
+            if (landed===0) {setMessage("來球已落台，現在擊球！","球拍對準球的位置；球快而旋轉強時，容錯更小。");updateGear();updateHud();}
+          }
+        } else { point(b.returnSide===null?1-b.hitter:b.hitter,b.returnSide===null?"球出界。":"對手未能回擊。"); return; }
+      }
+      if (Math.abs(b.z)>1.83 || Math.abs(b.x)>1.22 || b.y<-.18) {
+        point(b.returnSide===null?1-b.hitter:b.hitter,b.returnSide===null?"球出界。":"對手未能回擊。");
+      }
+    }
+    function project(x,z,y) {
+      const t=clamp((z+L/2)/L,-.12,1.14), scale=208+160*t;
+      return {x:460+x*scale,y:154+326*t-y*(188+105*t),scale:scale,t:t};
+    }
+    function poly(points,fill,stroke,width) {
+      ctx.beginPath(); ctx.moveTo(points[0].x,points[0].y);
+      for (let i=1;i<points.length;i++) ctx.lineTo(points[i].x,points[i].y);
+      ctx.closePath(); if (fill) {ctx.fillStyle=fill;ctx.fill();}
+      if (stroke) {ctx.lineWidth=width||1;ctx.strokeStyle=stroke;ctx.stroke();}
+    }
+    function line(a,b,color,width) {ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.lineWidth=width;ctx.strokeStyle=color;ctx.stroke();}
+    function circle(x,y,r,fill) {ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fillStyle=fill;ctx.fill();}
+    function rounded(x,y,w,h,r,fill) {ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fillStyle=fill;ctx.fill();}
+    function drawPlayer(x,far) {
+      const pos=project(x,far?-1.65:1.69,0), py=far?160:535, scale=far ? .85 : 1.12;
+      ctx.save(); ctx.translate(pos.x,py); ctx.scale(scale,scale);
+      circle(0,-69,15,far?"#e8ac8d":"#e5b092");
+      rounded(-23,-54,46,55,16,far?"#df886e":"#8ecdec");
+      line({x:-12,y:0},{x:-20,y:24},far?"#243541":"#213b44",8);
+      line({x:12,y:0},{x:20,y:24},far?"#243541":"#213b44",8);
+      line({x:far?-20:-23,y:-37},{x:far?-40:-46,y:-12},far?"#e8ac8d":"#e5b092",9);
+      ctx.restore();
+    }
+    function drawPaddle(x,far) {
+      const pos=project(x,far?-1.48:1.46,.2);
+      ctx.save(); ctx.translate(pos.x+(far?20:-22),pos.y); ctx.rotate(far?-.33:.35);
+      ctx.fillStyle="#8b5b3b";ctx.fillRect(-5,12,10,39);
+      ctx.beginPath();ctx.ellipse(0,0,far?18:24,far?24:31,0,0,Math.PI*2);ctx.fillStyle=far?"#da745e":"#d42c39";ctx.fill();ctx.lineWidth=4;ctx.strokeStyle="#e7c28e";ctx.stroke();
+      ctx.restore();
+    }
+    function drawCourt() {
+      const grd=ctx.createLinearGradient(0,0,0,570);grd.addColorStop(0,"#0a2633");grd.addColorStop(.57,"#16404a");grd.addColorStop(1,"#10252c");ctx.fillStyle=grd;ctx.fillRect(0,0,920,570);
+      for (let i=0;i<12;i++) { const x=35+i*78;circle(x,77+Math.sin(i*2)*6,5+i%3,"#294b58"); }
+      const floor=ctx.createRadialGradient(460,420,20,460,420,500);floor.addColorStop(0,"#285665");floor.addColorStop(1,"#09202a");ctx.fillStyle=floor;ctx.fillRect(0,215,920,355);
+      ctx.fillStyle="#143945";ctx.fillRect(0,520,920,50);
+      drawPlayer(g.aiX,true);
+      const fl=project(-W/2,-L/2,0),fr=project(W/2,-L/2,0),nl=project(-W/2,L/2,0),nr=project(W/2,L/2,0);
+      poly([{x:nl.x,y:nl.y+21},{x:nr.x,y:nr.y+21},{x:fr.x,y:fr.y+17},{x:fl.x,y:fl.y+17}],"#0a252d");
+      poly([fl,fr,nr,nl],"#12636c","#bcefe5",3);
+      poly([project(-W/2,-L/2,0),project(W/2,-L/2,0),project(W/2,0,0),project(-W/2,0,0)],"#13656e");
+      poly([project(-W/2,0,0),project(W/2,0,0),nr,nl],"#176e74");
+      line(project(0,-L/2,0),project(0,L/2,0),"#d1efed",2);
+      line(project(-W/2,0,0),project(W/2,0,0),"#e9f5e7",3);
+      line(fl,fr,"#f1f5e9",4);line(nl,nr,"#f1f5e9",4);line(fl,nl,"#f1f5e9",4);line(fr,nr,"#f1f5e9",4);
+      line(project(-W/2,0,0),project(-W/2,0,NET),"#e1e7df",5);line(project(W/2,0,0),project(W/2,0,NET),"#e1e7df",5);
+      const netL=project(-W/2-.09,0,NET),netR=project(W/2+.09,0,NET),netBL=project(-W/2-.09,0,0),netBR=project(W/2+.09,0,0);
+      if (g.ball && g.ball.z<0) drawBall();
+      poly([netL,netR,netBR,netBL],"#d6ece72e","#dcebe4",1);
+      for (let i=1;i<24;i++){const x=-W/2-.09+i*(W+.18)/24;line(project(x,0,0),project(x,0,NET),"#d6eee454",1);}
+      for (let i=1;i<5;i++){const y=i*NET/5;line(project(-W/2-.09,0,y),project(W/2+.09,0,y),"#d6eee449",1);}
+      line(netL,netR,"#f4f4ec",5);
+      if (g.ball && g.ball.z>=0) drawBall();
+      drawPlayer(g.playerX,false);drawPaddle(g.aiX,true);drawPaddle(g.playerX,false);
+      if (g.flash>0) {const p=project(g.hitX,g.hitZ,.18);circle(p.x,p.y,16*g.flash,"#fff6cc88");}
+      if (g.phase==="ready" && g.server===0) {
+        const p=project(g.playerX*.86,1.18,.31);circle(p.x,p.y,9,"#f7fcf7");
+      }
+      if (g.phase==="toss") {
+        const x=g.tossSide===0?g.playerX*.86:g.aiX*.86;
+        const z=g.tossSide===0?1.18:-1.18;
+        const y=.16+2.34*g.tossT-.5*G*g.tossT*g.tossT;
+        const p=project(x,z,y);circle(p.x,p.y,8,"#fffefa");
+      }
+      const aim=project(g.aimX,-g.depth,.003);
+      ctx.beginPath();ctx.ellipse(aim.x,aim.y,16,8,0,0,Math.PI*2);ctx.strokeStyle="#f5d58bbb";ctx.lineWidth=2;ctx.stroke();
+      circle(aim.x,aim.y,3,"#f5d58b");
+    }
+    function drawBall() {
+      const b=g.ball;if(!b)return;
+      const shadow=project(b.x,b.z,.002),pos=project(b.x,b.z,b.y),rad=clamp(5+4*pos.t,4,9);
+      ctx.beginPath();ctx.ellipse(shadow.x,shadow.y,rad*1.35,rad*.55,0,0,Math.PI*2);ctx.fillStyle="#062b3888";ctx.fill();
+      line(shadow,pos,"#b7f2e844",1);
+      const glow=ctx.createRadialGradient(pos.x-2,pos.y-3,1,pos.x,pos.y,rad*2.3);glow.addColorStop(0,"#fff");glow.addColorStop(.4,"#f8faf1");glow.addColorStop(.64,"#dbf5e9");glow.addColorStop(1,"#b6f5d100");circle(pos.x,pos.y,rad*2.3,glow);
+      circle(pos.x,pos.y,rad,"#fffefa");circle(pos.x-2,pos.y-2,rad*.28,"#e5fff7");
+      if (Math.abs(b.spin)>.4) {ctx.strokeStyle=b.spin>0?"#9ef5d3":"#f5d58b";ctx.lineWidth=2;ctx.beginPath();ctx.arc(pos.x,pos.y,rad+4,0,Math.PI*1.3);ctx.stroke();}
+    }
+    function render() {
+      drawCourt();
+      if (g.phase==="over") {
+        ctx.fillStyle="#061d26ca";ctx.fillRect(0,0,920,570);
+        ctx.textAlign="center";ctx.fillStyle=g.p>g.ai?"#9ef5d3":"#ffab91";ctx.font="900 52px system-ui";
+        ctx.fillText(g.p>g.ai?"你贏得這局！":"再來一局！",460,264);
+        ctx.fillStyle="#f2f4e9";ctx.font="700 23px system-ui";ctx.fillText(g.p+" : "+g.ai,460,310);
+        ctx.font="16px system-ui";ctx.fillText("按下方「重新開始比賽」或擊球鍵",460,346);
+      }
+    }
+    function frame(now) {
+      let dt=Math.min(.05,(now-g.last)/1000);g.last=now;
+      if (g.keys.has("ArrowLeft")||g.keys.has("a")) g.playerX-=dt*1.65;
+      if (g.keys.has("ArrowRight")||g.keys.has("d")) g.playerX+=dt*1.65;
+      g.playerX=clamp(g.playerX,-.67,.67);
+      if (g.phase==="ready"&&g.server===1) {g.aiServeTimer-=dt;if(g.aiServeTimer<=0)serve(1);}
+      if (g.phase==="toss") {g.tossT+=dt;if(g.tossT>=.40)serveShot(g.tossSide);}
+      if (g.phase==="rally") {
+        const b=g.ball;
+        if (b) {
+          const target=clamp(b.x+b.vx*.14,-.66,.66);
+          const pace=$("difficulty").value==="club" ? 1.42 : .97;
+          g.aiX+=clamp(target-g.aiX,-pace*dt,pace*dt);
+          let time=dt*.78;
+          while(time>0 && g.phase==="rally") {const h=Math.min(.004,time);ballStep(h);time-=h;}
+          if (g.phase==="rally") {
+            if (g.pending>0) {g.pending-=dt;if(canPlayerHit())playerHit();}
+            aiThink();
+          }
+        }
+      }
+      g.flash=Math.max(0,g.flash-dt*2.5);
+      render();requestAnimationFrame(frame);
+    }
+    document.querySelectorAll("[data-shot]").forEach(btn => btn.addEventListener("click",() => {
+      g.shot=btn.dataset.shot;document.querySelectorAll("[data-shot]").forEach(x=>x.classList.toggle("selected",x===btn));
+      setMessage("已選："+shotNames[g.shot],g.shot==="smash"?"扣殺適合高球；低球硬扣容易下網。":g.shot==="loop"?"弧圈適合拉下旋，越能抓球的膠皮旋轉越強。":"觀察來球與對手站位，再決定擊球時機。");
+    }));
+    document.querySelectorAll("[data-depth]").forEach(btn => btn.addEventListener("click",() => {
+      g.aimX=Number(btn.dataset.x);g.depth=Number(btn.dataset.depth);
+      document.querySelectorAll("[data-depth]").forEach(x=>x.classList.toggle("selected",x===btn));
+    }));
+    $("hit").addEventListener("click",requestHit);
+    $("restart").addEventListener("click",resetMatch);
+    ["blade","fh","bh","difficulty"].forEach(id=>$(id).addEventListener("change",()=>updateGear()));
+    function pointerMove(ev) {
+      const rect=cvs.getBoundingClientRect();
+      const px=(ev.clientX-rect.left)/rect.width*920;
+      g.playerX=clamp((px-460)/360,-.67,.67);
+    }
+    cvs.addEventListener("pointermove",pointerMove);
+    cvs.addEventListener("pointerdown",ev=>{pointerMove(ev);requestHit();});
+    window.addEventListener("keydown",ev=>{
+      if (ev.target && ["SELECT","INPUT","TEXTAREA"].includes(ev.target.tagName)) return;
+      const k=ev.key.toLowerCase();
+      if ([" ","arrowleft","arrowright"].includes(k)) ev.preventDefault();
+      if (k===" ") {if(!ev.repeat)requestHit();}
+      if (k==="arrowleft"||k==="a") g.keys.add("ArrowLeft");
+      if (k==="arrowright"||k==="d") g.keys.add("ArrowRight");
+      if (k==="q"||k==="e") {
+        const i=g.aimX<-.25?0:g.aimX>.25?2:1,next=clamp(i+(k==="q"?-1:1),0,2);
+        const btn=[...document.querySelectorAll("[data-depth]")].filter(x=>Number(x.dataset.depth)===g.depth)[next];
+        if(btn)btn.click();
+      }
+      const names=["push","block","drive","loop","side","smash"],n=Number(k);
+      if(n>=1&&n<=6)document.querySelector('[data-shot="'+names[n-1]+'"]').click();
+    });
+    window.addEventListener("keyup",ev=>{
+      const k=ev.key.toLowerCase();
+      if(k==="arrowleft"||k==="a")g.keys.delete("ArrowLeft");
+      if(k==="arrowright"||k==="d")g.keys.delete("ArrowRight");
+    });
+    if (location.hash==="#rules") $("rules").open=true;
+    loadGear();resetPoint();requestAnimationFrame(frame);
+  })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,1428 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f2ea">
+  <meta name="description" content="認識遊戲式學習，透過十個互動範例探索學習機制，包含可配置真實器材的 2.5D 桌球對戰。">
+  <title>學習遊戲研究室</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+  <style>
+    :root {
+      --paper: #f5f2ea;
+      --ink: #19322f;
+      --muted: #687773;
+      --forest: #143e38;
+      --forest-light: #24584e;
+      --lime: #d3f16a;
+      --coral: #ff8e70;
+      --blue: #a9c9fa;
+      --lilac: #c8b5f5;
+      --line: rgba(25, 50, 47, .12);
+      --scrollbar-compensation: 0px;
+      --nav-height: 78px;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      overflow-y: scroll;
+      scrollbar-gutter: stable;
+      scroll-padding-top: 7rem;
+    }
+
+    body {
+      margin: 0;
+      padding-top: var(--nav-height);
+      padding-left: var(--scrollbar-compensation);
+      color: var(--ink);
+      background: var(--paper);
+      font-family: "Noto Sans TC", "Microsoft JhengHei", system-ui, sans-serif;
+      overflow-x: hidden;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .navbar {
+      left: var(--scrollbar-compensation);
+      right: var(--scrollbar-compensation);
+      min-height: var(--nav-height);
+      padding: .75rem 0;
+      background: rgba(245, 242, 234, .94);
+      border-bottom: 1px solid rgba(25, 50, 47, .08);
+      backdrop-filter: blur(18px);
+      z-index: 1030;
+    }
+
+    .navbar .container {
+      max-width: 1240px;
+    }
+
+    .brand-mark {
+      display: inline-grid;
+      width: 38px;
+      height: 38px;
+      place-items: center;
+      margin-right: .65rem;
+      color: var(--forest);
+      background: var(--lime);
+      border-radius: 13px;
+      font-size: 1.35rem;
+      transform: rotate(-7deg);
+    }
+
+    .navbar-brand {
+      display: inline-flex;
+      align-items: center;
+      color: var(--forest);
+      font-weight: 850;
+      letter-spacing: -.04em;
+    }
+
+    .navbar-nav .nav-link {
+      padding: .65rem .9rem !important;
+      color: #52635f;
+      font-size: .92rem;
+      font-weight: 650;
+    }
+
+    .navbar-nav .nav-link:hover,
+    .navbar-nav .nav-link:focus {
+      color: var(--forest);
+    }
+
+    .nav-cta {
+      padding: .72rem 1rem;
+      color: #fff;
+      background: var(--forest);
+      border-radius: 999px;
+      font-size: .9rem;
+      font-weight: 750;
+      text-decoration: none;
+      transition: transform .2s ease, background .2s ease;
+    }
+
+    .nav-cta:hover {
+      color: #fff;
+      background: #24584e;
+      transform: translateY(-2px);
+    }
+
+    .hero {
+      position: relative;
+      min-height: 640px;
+      padding: 5.8rem 0 5.2rem;
+      color: #f7f6ed;
+      background:
+        radial-gradient(circle at 80% 16%, rgba(211, 241, 106, .13), transparent 24rem),
+        radial-gradient(circle at 12% 90%, rgba(255, 142, 112, .12), transparent 25rem),
+        var(--forest);
+      isolation: isolate;
+      overflow: hidden;
+    }
+
+    .hero::after {
+      position: absolute;
+      right: -9rem;
+      bottom: -16rem;
+      z-index: -1;
+      width: 43rem;
+      height: 43rem;
+      border: 1px solid rgba(255, 255, 255, .09);
+      border-radius: 50%;
+      box-shadow: 0 0 0 4rem rgba(255, 255, 255, .025), 0 0 0 9rem rgba(255, 255, 255, .025);
+      content: "";
+    }
+
+    .hero .container {
+      position: relative;
+      z-index: 1;
+      max-width: 1240px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: .65rem;
+      margin-bottom: 1.35rem;
+      color: var(--lime);
+      font-size: .76rem;
+      font-weight: 800;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      width: 29px;
+      height: 2px;
+      background: currentColor;
+      content: "";
+    }
+
+    .hero h1 {
+      max-width: 720px;
+      margin: 0 0 1.3rem;
+      font-size: clamp(3rem, 7vw, 6.25rem);
+      font-weight: 850;
+      letter-spacing: -.075em;
+      line-height: 1.02;
+    }
+
+    .hero h1 span {
+      color: var(--lime);
+    }
+
+    .hero-copy {
+      max-width: 550px;
+      color: rgba(247, 246, 237, .78);
+      font-size: clamp(1rem, 1.6vw, 1.18rem);
+      line-height: 1.9;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    .button-lime {
+      display: inline-flex;
+      min-height: 52px;
+      align-items: center;
+      justify-content: center;
+      padding: .8rem 1.35rem;
+      color: var(--forest);
+      background: var(--lime);
+      border: 0;
+      border-radius: 999px;
+      font-weight: 800;
+      text-decoration: none;
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+
+    .button-lime:hover {
+      color: var(--forest);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, .17);
+      transform: translateY(-2px);
+    }
+
+    .hero-note {
+      color: rgba(247, 246, 237, .68);
+      font-size: .86rem;
+    }
+
+    .hero-art-wrap {
+      display: flex;
+      justify-content: center;
+      padding: 2rem 1rem 1rem;
+    }
+
+    .quest-board {
+      position: relative;
+      width: min(100%, 430px);
+      padding: 1.35rem;
+      color: var(--ink);
+      background: #f9f7ef;
+      border: 1px solid rgba(255, 255, 255, .52);
+      border-radius: 30px;
+      box-shadow: 0 30px 70px rgba(3, 22, 18, .26);
+      transform: rotate(2deg);
+    }
+
+    .quest-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: .25rem .15rem 1.2rem;
+    }
+
+    .quest-kicker {
+      color: #788580;
+      font-size: .72rem;
+      font-weight: 800;
+      letter-spacing: .1em;
+    }
+
+    .quest-count {
+      padding: .4rem .65rem;
+      color: var(--forest);
+      background: #eaf3d1;
+      border-radius: 999px;
+      font-size: .75rem;
+      font-weight: 800;
+    }
+
+    .quest-scene {
+      position: relative;
+      height: 238px;
+      overflow: hidden;
+      background: #e7eee0;
+      border-radius: 22px;
+    }
+
+    .scene-sun {
+      position: absolute;
+      top: 25px;
+      right: 30px;
+      width: 53px;
+      height: 53px;
+      background: #ffd36c;
+      border: 7px solid rgba(255, 255, 255, .65);
+      border-radius: 50%;
+    }
+
+    .scene-hill {
+      position: absolute;
+      right: -30px;
+      bottom: -77px;
+      left: -30px;
+      height: 170px;
+      background: #9dcf9b;
+      border-radius: 50% 50% 0 0;
+      transform: rotate(-5deg);
+    }
+
+    .scene-hill.back {
+      right: 90px;
+      bottom: -95px;
+      height: 170px;
+      background: #b7d9a8;
+      transform: rotate(10deg);
+    }
+
+    .path-line {
+      position: absolute;
+      top: 60px;
+      left: 82px;
+      width: 180px;
+      height: 155px;
+      border: 3px dotted rgba(20, 62, 56, .38);
+      border-top-color: transparent;
+      border-left-color: transparent;
+      border-radius: 50%;
+      transform: rotate(-24deg);
+    }
+
+    .quest-node {
+      position: absolute;
+      display: grid;
+      width: 46px;
+      height: 46px;
+      place-items: center;
+      border: 4px solid #f9f7ef;
+      border-radius: 50%;
+      box-shadow: 0 5px 12px rgba(25, 50, 47, .14);
+      font-size: 1.1rem;
+      font-weight: 900;
+    }
+
+    .quest-node.one {
+      top: 52px;
+      left: 45px;
+      background: var(--coral);
+    }
+
+    .quest-node.two {
+      top: 133px;
+      left: 148px;
+      background: var(--lime);
+    }
+
+    .quest-node.three {
+      top: 60px;
+      right: 60px;
+      color: #fff;
+      background: var(--forest-light);
+    }
+
+    .quest-player {
+      position: absolute;
+      right: 107px;
+      bottom: 40px;
+      z-index: 2;
+      display: grid;
+      width: 55px;
+      height: 55px;
+      place-items: center;
+      background: #fff;
+      border: 3px solid #ffb08e;
+      border-radius: 18px;
+      box-shadow: 0 7px 15px rgba(25, 50, 47, .12);
+      font-size: 1.8rem;
+      transform: rotate(-8deg);
+    }
+
+    .quest-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem .2rem .15rem;
+    }
+
+    .quest-footer strong {
+      display: block;
+      font-size: .95rem;
+    }
+
+    .quest-footer small {
+      color: #788580;
+    }
+
+    .quest-stars {
+      color: #dd9f27;
+      font-size: 1.15rem;
+      letter-spacing: .05em;
+    }
+
+    .hero-stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2.2rem;
+      margin-top: 4.6rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(255, 255, 255, .15);
+    }
+
+    .stat strong {
+      display: block;
+      color: var(--lime);
+      font-size: 1.65rem;
+      font-weight: 850;
+      letter-spacing: -.05em;
+    }
+
+    .stat span {
+      color: rgba(247, 246, 237, .68);
+      font-size: .8rem;
+    }
+
+    .section-pad {
+      padding: 6.5rem 0;
+    }
+
+    .section-pad .container {
+      max-width: 1240px;
+    }
+
+    .section-kicker {
+      margin-bottom: .75rem;
+      color: #648078;
+      font-size: .76rem;
+      font-weight: 850;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+    }
+
+    .section-title {
+      max-width: 790px;
+      margin-bottom: 1rem;
+      color: var(--forest);
+      font-size: clamp(2.1rem, 4vw, 3.65rem);
+      font-weight: 850;
+      letter-spacing: -.065em;
+      line-height: 1.14;
+    }
+
+    .section-lead {
+      max-width: 760px;
+      color: #5d6d68;
+      font-size: 1.04rem;
+      line-height: 1.9;
+    }
+
+    .definition-section {
+      background: #fffdf8;
+    }
+
+    .definition-card {
+      height: 100%;
+      padding: 2rem;
+      background: #f3f2e9;
+      border: 1px solid rgba(25, 50, 47, .06);
+      border-radius: 25px;
+    }
+
+    .definition-card h3 {
+      margin: 1.25rem 0 .8rem;
+      color: var(--forest);
+      font-size: 1.25rem;
+      font-weight: 820;
+    }
+
+    .definition-card p {
+      margin: 0;
+      color: #60716b;
+      line-height: 1.85;
+    }
+
+    .icon-tile {
+      display: grid;
+      width: 54px;
+      height: 54px;
+      place-items: center;
+      background: #e2efbd;
+      border-radius: 18px;
+      font-size: 1.45rem;
+    }
+
+    .definition-card:nth-child(2) .icon-tile {
+      background: #ffe0d5;
+    }
+
+    .loop-wrap {
+      margin-top: 3.5rem;
+      padding: 1.5rem;
+      background: var(--forest);
+      border-radius: 28px;
+      color: white;
+    }
+
+    .loop-step {
+      display: flex;
+      height: 100%;
+      min-height: 118px;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 1.1rem;
+      background: rgba(255, 255, 255, .07);
+      border: 1px solid rgba(255, 255, 255, .1);
+      border-radius: 20px;
+    }
+
+    .loop-step span {
+      color: var(--lime);
+      font-size: .72rem;
+      font-weight: 800;
+      letter-spacing: .12em;
+    }
+
+    .loop-step strong {
+      margin-top: .8rem;
+      font-size: 1.02rem;
+    }
+
+    .loop-arrow {
+      display: grid;
+      height: 100%;
+      place-items: center;
+      color: var(--lime);
+      font-size: 1.3rem;
+    }
+
+    .source-note {
+      margin-top: 1.5rem;
+      color: #6d7a75;
+      font-size: .87rem;
+      line-height: 1.8;
+    }
+
+    .source-note a {
+      color: var(--forest);
+      font-weight: 750;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 3px;
+    }
+
+    .mechanisms-section {
+      background: var(--paper);
+    }
+
+    .mechanism-intro {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: end;
+      justify-content: space-between;
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .demo-note {
+      max-width: 360px;
+      padding: .85rem 1rem;
+      color: #4e635d;
+      background: #e7eddb;
+      border-radius: 14px;
+      font-size: .84rem;
+      line-height: 1.6;
+    }
+
+    .mechanism-card {
+      height: 100%;
+      overflow: hidden;
+      background: #fffdf8;
+      border: 1px solid rgba(25, 50, 47, .09);
+      border-radius: 24px;
+      box-shadow: 0 12px 34px rgba(32, 56, 49, .055);
+      transition: transform .25s ease, box-shadow .25s ease;
+    }
+
+    .mechanism-card:hover {
+      box-shadow: 0 18px 44px rgba(32, 56, 49, .11);
+      transform: translateY(-4px);
+    }
+
+    .mechanism-copy {
+      min-height: 258px;
+      padding: 1.55rem 1.55rem 1.25rem;
+    }
+
+    .mechanism-topline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1.1rem;
+    }
+
+    .mechanism-number {
+      color: #81918b;
+      font-size: .75rem;
+      font-weight: 850;
+      letter-spacing: .12em;
+    }
+
+    .mechanism-tag {
+      padding: .42rem .7rem;
+      color: #37665a;
+      background: #e8efdf;
+      border-radius: 999px;
+      font-size: .7rem;
+      font-weight: 780;
+      white-space: nowrap;
+    }
+
+    .mechanism-card:nth-child(2) .mechanism-tag,
+    .mechanism-card:nth-child(5) .mechanism-tag {
+      color: #9c4e38;
+      background: #ffe5dc;
+    }
+
+    .mechanism-copy h3 {
+      margin: 0 0 .6rem;
+      color: var(--forest);
+      font-size: 1.35rem;
+      font-weight: 850;
+      letter-spacing: -.035em;
+    }
+
+    .game-name {
+      margin-bottom: .75rem;
+      color: #55716a;
+      font-size: .8rem;
+      font-weight: 760;
+    }
+
+    .mechanism-copy p {
+      margin-bottom: .7rem;
+      color: #5e6e68;
+      font-size: .91rem;
+      line-height: 1.8;
+    }
+
+    .learning-translation {
+      padding-top: .65rem;
+      border-top: 1px solid var(--line);
+      color: #344d46 !important;
+      font-size: .83rem !important;
+    }
+
+    .learning-translation strong {
+      color: var(--forest);
+    }
+
+    .frame-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: .5rem;
+      padding: .75rem 1rem;
+      color: #e9f2df;
+      background: #193d38;
+      font-size: .76rem;
+      font-weight: 720;
+    }
+
+    .frame-heading span:last-child {
+      color: #c5da77;
+      font-size: .7rem;
+      font-weight: 780;
+    }
+
+    .frame-shell {
+      position: relative;
+      overflow: hidden;
+      background: #152a27;
+    }
+
+    .frame-launch {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      display: flex;
+      width: 100%;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: .55rem;
+      color: #f7f6ed;
+      background: radial-gradient(circle at 50% 40%, #24584e, #152a27 70%);
+      border: 0;
+      cursor: pointer;
+      transition: background .2s ease;
+    }
+
+    .frame-launch::before {
+      color: var(--lime);
+      content: "▶";
+      font-size: 2rem;
+    }
+
+    .frame-launch span {
+      font-size: 1.05rem;
+      font-weight: 820;
+    }
+
+    .frame-launch small {
+      color: rgba(247, 246, 237, .72);
+      font-size: .8rem;
+    }
+
+    .frame-launch:hover:not(:disabled) {
+      background: radial-gradient(circle at 50% 40%, #316d60, #152a27 70%);
+    }
+
+    .frame-launch:focus-visible {
+      outline: 3px solid var(--lime);
+      outline-offset: -6px;
+    }
+
+    .frame-launch:disabled {
+      cursor: wait;
+    }
+
+    .phaser-frame {
+      display: block;
+      width: 100%;
+      height: 450px;
+      border: 0;
+      background: #152a27;
+    }
+
+    .phaser-frame[data-local] {
+      height: 950px;
+    }
+
+    .frame-actions {
+      display: flex;
+      justify-content: space-between;
+      gap: .7rem;
+      padding: .75rem 1rem;
+      background: #fffdf8;
+    }
+
+    .frame-actions a {
+      color: #56716a;
+      font-size: .76rem;
+      font-weight: 760;
+      text-decoration: none;
+    }
+
+    .frame-actions a:hover {
+      color: #bb6046;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .design-section {
+      color: #f7f6ed;
+      background: #193d38;
+    }
+
+    .design-section .section-kicker {
+      color: var(--lime);
+    }
+
+    .design-section .section-title {
+      color: #f7f6ed;
+    }
+
+    .design-section .section-lead {
+      color: rgba(247, 246, 237, .7);
+    }
+
+    .design-principle {
+      height: 100%;
+      padding: 1.45rem;
+      background: rgba(255, 255, 255, .07);
+      border: 1px solid rgba(255, 255, 255, .12);
+      border-radius: 21px;
+    }
+
+    .design-principle span {
+      display: inline-grid;
+      width: 36px;
+      height: 36px;
+      place-items: center;
+      color: var(--forest);
+      background: var(--lime);
+      border-radius: 50%;
+      font-size: .82rem;
+      font-weight: 900;
+    }
+
+    .design-principle h3 {
+      margin: 1rem 0 .55rem;
+      color: #fff;
+      font-size: 1.03rem;
+      font-weight: 800;
+    }
+
+    .design-principle p {
+      margin: 0;
+      color: rgba(247, 246, 237, .7);
+      font-size: .88rem;
+      line-height: 1.75;
+    }
+
+    .closing {
+      padding: 5rem 0;
+      background: #e8efdc;
+    }
+
+    .closing-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
+      padding: 2.2rem;
+      background: #fffdf8;
+      border: 1px solid rgba(25, 50, 47, .08);
+      border-radius: 28px;
+    }
+
+    .closing-card h2 {
+      max-width: 700px;
+      margin: 0 0 .65rem;
+      color: var(--forest);
+      font-size: clamp(1.7rem, 3vw, 2.5rem);
+      font-weight: 850;
+      letter-spacing: -.06em;
+    }
+
+    .closing-card p {
+      max-width: 690px;
+      margin: 0;
+      color: #63736e;
+      line-height: 1.8;
+    }
+
+    .footer {
+      padding: 2rem 0;
+      color: rgba(247, 246, 237, .75);
+      background: #102f2b;
+      font-size: .82rem;
+    }
+
+    .footer .container {
+      max-width: 1240px;
+    }
+
+    .footer a {
+      color: var(--lime);
+      text-decoration: none;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    section[id],
+    header[id] {
+      scroll-margin-top: 6.5rem;
+    }
+
+    .skip-link {
+      position: fixed;
+      top: .5rem;
+      left: 1rem;
+      z-index: 1100;
+      padding: .6rem .9rem;
+      color: var(--forest);
+      background: var(--lime);
+      border-radius: 999px;
+      transform: translateY(-160%);
+    }
+
+    .skip-link:focus {
+      transform: translateY(0);
+    }
+
+    @media (max-width: 991.98px) {
+      :root {
+        --nav-height: 72px;
+      }
+
+      .navbar-collapse {
+        padding: .8rem 1rem 1rem;
+        background: #f5f2ea;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        box-shadow: 0 18px 32px rgba(25, 50, 47, .1);
+      }
+
+      .nav-cta {
+        display: inline-flex;
+        margin-top: .5rem;
+      }
+
+      .hero {
+        padding: 4.5rem 0 4rem;
+      }
+
+      .hero-art-wrap {
+        padding-top: 3rem;
+      }
+
+      .hero-stats {
+        margin-top: 3rem;
+      }
+
+      .section-pad {
+        padding: 5rem 0;
+      }
+    }
+
+    @media (max-width: 575.98px) {
+      :root {
+        --nav-height: 68px;
+      }
+
+      .hero h1 {
+        font-size: clamp(2.8rem, 14vw, 4.4rem);
+      }
+
+      .hero-stats {
+        gap: 1.25rem 1.7rem;
+      }
+
+      .stat strong {
+        font-size: 1.35rem;
+      }
+
+      .quest-board {
+        padding: .85rem;
+        border-radius: 23px;
+      }
+
+      .quest-scene {
+        height: 205px;
+      }
+
+      .section-pad {
+        padding: 4rem 0;
+      }
+
+      .definition-card {
+        padding: 1.5rem;
+      }
+
+      .loop-wrap {
+        padding: 1rem;
+      }
+
+      .loop-step {
+        min-height: 95px;
+      }
+
+      .loop-arrow {
+        height: 34px;
+        transform: rotate(90deg);
+      }
+
+      .mechanism-copy {
+        min-height: auto;
+        padding: 1.3rem;
+      }
+
+      .phaser-frame {
+        height: 420px;
+      }
+
+      .phaser-frame[data-local] {
+        height: 1040px;
+      }
+
+      .closing-card {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 1.5rem;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      *,
+      *::before,
+      *::after {
+        transition-duration: .01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主要內容</a>
+
+  <nav class="navbar navbar-expand-lg fixed-top" aria-label="主要導覽">
+    <div class="container">
+      <a class="navbar-brand" href="#top">
+        <span class="brand-mark" aria-hidden="true">✳</span>
+        <span>學習遊戲研究室</span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="切換導覽選單">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="mainNav">
+        <ul class="navbar-nav ms-auto align-items-lg-center">
+          <li class="nav-item"><a class="nav-link" href="#about">認識遊戲式學習</a></li>
+          <li class="nav-item"><a class="nav-link" href="#mechanisms">十種學習機制</a></li>
+          <li class="nav-item"><a class="nav-link" href="#design">設計原則</a></li>
+          <li class="nav-item ms-lg-2"><a class="nav-cta" href="#mechanisms">探索互動範例 <span aria-hidden="true">↘</span></a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <main id="main">
+    <header class="hero" id="top">
+      <div class="container">
+        <div class="row align-items-center">
+          <div class="col-lg-7">
+            <p class="eyebrow">Learning through play</p>
+            <h1>讓知識<br><span>玩得起來</span></h1>
+            <p class="hero-copy">把學習目標放進一段可操作的冒險。選擇、嘗試、得到回饋，再帶著新理解走向下一關。</p>
+            <div class="hero-actions">
+              <a class="button-lime" href="#about">開始認識 <span class="ms-2" aria-hidden="true">↓</span></a>
+              <span class="hero-note">十種機制，十個可操作的互動範例</span>
+            </div>
+            <div class="hero-stats" aria-label="範例概況">
+              <div class="stat"><strong>10</strong><span>種學習機制</span></div>
+              <div class="stat"><strong>10</strong><span>個互動遊戲</span></div>
+              <div class="stat"><strong>10</strong><span>可操作學習範例</span></div>
+            </div>
+          </div>
+          <div class="col-lg-5">
+            <div class="hero-art-wrap" aria-hidden="true">
+              <div class="quest-board">
+                <div class="quest-head">
+                  <div><div class="quest-kicker">今日學習任務</div><strong>森林探索路線</strong></div>
+                  <span class="quest-count">第 2 關</span>
+                </div>
+                <div class="quest-scene">
+                  <span class="scene-sun"></span>
+                  <span class="scene-hill back"></span>
+                  <span class="scene-hill"></span>
+                  <span class="path-line"></span>
+                  <span class="quest-node one">✓</span>
+                  <span class="quest-node two">2</span>
+                  <span class="quest-node three">3</span>
+                  <span class="quest-player">🧭</span>
+                </div>
+                <div class="quest-footer">
+                  <div><strong>完成挑戰，解鎖新線索</strong><small>探索、練習、發現</small></div>
+                  <span class="quest-stars" aria-label="三顆星">✦ ✦ ✧</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section class="section-pad definition-section" id="about">
+      <div class="container">
+        <div class="row g-4 align-items-end">
+          <div class="col-lg-7">
+            <p class="section-kicker">01 / 先理解方法</p>
+            <h2 class="section-title">什麼是遊戲式學習</h2>
+            <p class="section-lead">遊戲式學習把學習目標、規則與挑戰整合進可玩的情境。學習者透過選擇與行動練習概念，從回饋看見結果，再把經驗整理成可帶走的知識與技能。</p>
+          </div>
+          <div class="col-lg-5">
+            <div class="source-note mt-0">Plass、Homer 與 Kinzer 的研究從認知、行為、情緒與社會參與等角度討論遊戲如何支持學習。<a href="https://doi.org/10.1080/00461520.2015.1122533" target="_blank" rel="noreferrer">閱讀研究摘要 ↗</a></div>
+          </div>
+        </div>
+
+        <div class="row g-3 mt-4">
+          <div class="col-md-6">
+            <article class="definition-card">
+              <div class="icon-tile" aria-hidden="true">🎯</div>
+              <h3>目標放在玩法裡</h3>
+              <p>玩家要做的事，正好就是要練習的知識或技能。辨認線索、解題、規劃路徑，都能成為前進的行動。</p>
+            </article>
+          </div>
+          <div class="col-md-6">
+            <article class="definition-card">
+              <div class="icon-tile" aria-hidden="true">💡</div>
+              <h3>每次嘗試都能帶來資訊</h3>
+              <p>清楚的回饋讓學習者知道結果如何形成，並有機會調整策略、再次嘗試，逐步建立理解。</p>
+            </article>
+          </div>
+        </div>
+
+        <div class="loop-wrap" aria-label="遊戲式學習循環">
+          <div class="row align-items-stretch g-2 g-md-3">
+            <div class="col-12 col-md"><div class="loop-step"><span>STEP 01</span><strong>接下任務</strong></div></div>
+            <div class="col-12 col-md-auto"><div class="loop-arrow" aria-hidden="true">→</div></div>
+            <div class="col-12 col-md"><div class="loop-step"><span>STEP 02</span><strong>採取行動</strong></div></div>
+            <div class="col-12 col-md-auto"><div class="loop-arrow" aria-hidden="true">→</div></div>
+            <div class="col-12 col-md"><div class="loop-step"><span>STEP 03</span><strong>讀取回饋</strong></div></div>
+            <div class="col-12 col-md-auto"><div class="loop-arrow" aria-hidden="true">→</div></div>
+            <div class="col-12 col-md"><div class="loop-step"><span>STEP 04</span><strong>反思再試</strong></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-pad mechanisms-section" id="mechanisms">
+      <div class="container">
+        <div class="mechanism-intro">
+          <div>
+            <p class="section-kicker">02 / 玩法可以教什麼</p>
+            <h2 class="section-title">十種機制，十種學習入口</h2>
+            <p class="section-lead mb-0">每個遊戲視窗都能直接操作。試著觀察規則如何影響玩家的判斷，再想想怎麼把相同機制轉成課堂任務。</p>
+          </div>
+          <div class="demo-note">多數範例使用下載的 Phaser 專案；2.5D 桌球對戰是本頁客製版。點選視窗中的按鈕即可載入遊戲，每次只載入一個範例。</div>
+        </div>
+
+        <div class="row g-4">
+          <div class="col-lg-6">
+            <article class="mechanism-card">
+              <div class="mechanism-copy">
+                <div class="mechanism-topline"><span class="mechanism-number">01 / MECHANIC</span><span class="mechanism-tag">目標與進度</span></div>
+                <h3>讓目標看得見</h3>
+                <div class="game-name">Phaser 範例：First Game</div>
+                <p>收集星星推動關卡進程，完成一輪後場上加入炸彈。明確任務和漸進挑戰讓玩家知道下一步。</p>
+                <p class="learning-translation"><strong>學習轉譯</strong> 把單元拆成可完成的小任務，讓進度和下一個目標一目了然。</p>
+              </div>
+              <div class="frame-heading"><span>收集星星，躲開危險</span><span>可操作範例</span></div>
+              <div class="frame-shell"><iframe class="phaser-frame" title="First Game 平台跳躍範例" data-example="src/games/firstgame/part10.js" data-module="false" loading="lazy" allow="fullscreen" referrerpolicy="no-referrer"></iframe></div>
+              <div class="frame-actions"><a class="open-example" href="#" target="_blank" rel="noreferrer">另開遊戲視窗 ↗</a><a href="https://github.com/phaserjs/examples" target="_blank" rel="noreferrer">範例來源 ↗</a></div>
+            </article>
+          </div>
+
+          <div class="col-lg-6">
+            <article class="mechanism-card">
+              <div class="mechanism-copy">
+                <div class="mechanism-topline"><span class="mechanism-number">02 / MECHANIC</span><span class="mechanism-tag">分數與獎勵</span></div>
+                <h3>讓努力得到回應</h3>
+                <div class="game-name">Phaser 範例：Coin Clicker</div>
+                <p>點擊硬幣就得到分數，倒數結束後可以比較成績。動作、結果和進度緊密連在一起。</p>
+                <p class="learning-translation"><strong>學習轉譯</strong> 為解題、完成練習或有效策略提供具體回應，獎勵需對準學習行為。</p>
+              </div>
+              <div class="frame-heading"><span>點擊硬幣累積分數</span><span>可操作範例</span></div>
+              <div class="frame-shell"><iframe class="phaser-frame" title="Coin Clicker 點擊計分範例" data-example="src/games/coin clicker/main.js" data-module="true" loading="lazy" allow="fullscreen" referrerpolicy="no-referrer"></iframe></div>
+              <div class="frame-actions"><a class="open-example" href="#" target="_blank" rel="noreferrer">另開遊戲視窗 ↗</a><a href="https://github.com/phaserjs/examples" target="_blank" rel="noreferrer">範例來源 ↗</a></div>
+            </article>
+          </div>
+
+          <div class="col-lg-6">
+            <article class="mechanism-card">
+              <div class="mechanism-copy">
+                <div class="mechanism-topline"><span class="mechanism-number">03 / MECHANIC</span><span class="mechanism-tag">時間挑戰</span></div>
+                <h3>在期限內辨認重點</h3>
+                <div class="game-name">Phaser 範例：Emoji Match</div>
+                <p>玩家要在倒數時間內找到相同表情。每輪重排版面，持續練習快速觀察與辨認。</p>
+                <p class="learning-translation"><strong>學習轉譯</strong> 用短回合練習熟練度，也提供不計時選項，照顧不同步調。</p>
+              </div>
+              <div class="frame-heading"><span>找出相同的表情</span><span>可操作範例</span></div>
+              <div class="frame-shell"><iframe class="phaser-frame" title="Emoji Match 限時配對範例" data-example="src/games/emoji match/main.js" data-module="true" loading="lazy" allow="fullscreen" referrerpolicy="no-referrer"></iframe></div>
+              <div class="frame-actions"><a class="open-example" href="#" target="_blank" rel="noreferrer">另開遊戲視窗 ↗</a><a href="https://github.com/phaserjs/examples" target="_blank" rel="noreferrer">範例來源 ↗</a></div>
+            </article>
+          </div>
+
+          <div class="col-lg-6">
+            <article class="mechanism-card">
+              <div class="mechanism-copy">
+                <div class="mechanism-topline"><span class="mechanism-number">04 / MECHANIC</span><span class="mechanism-tag">2.5D 桌球對戰</span></div>
+                <h3>選器材、讀旋轉、控制每一拍落點</h3>
+                <div class="game-name">自製遊戲：桌球競技場</div>
+                <p>選擇五個品牌的真實底板與正反手膠皮，依來球旋轉、落點和擊球時機打出弧圈、搓球、擋球或扣殺。</p>
+                <p class="learning-translation"><strong>學習轉譯</strong> 觀察器材特性與戰術選擇如何影響球速、弧線、容錯與得分。</p>
+              </div>
+              <div class="frame-heading"><span>讀旋轉、移動球拍、打向空檔</span><span>可操作範例</span></div>
+              <div class="frame-shell"><iframe class="phaser-frame" title="2.5D 桌球對戰遊戲" data-local="games/table-tennis-sim.html" loading="lazy" allow="fullscreen" referrerpolicy="no-referrer"></iframe></div>
+              <div class="frame-actions"><a class="open-example" href="#" target="_blank" rel="noreferrer">另開遊戲視窗 ↗</a><a href="games/table-tennis-sim.html#rules" target="_blank" rel="noreferrer">對戰規則 ↗</a></div>
+            </article>
+          </div>
+
+          <div class="col-lg-6">
+            <article class="mechanism-card">
+              <div class="mechanism-copy">
+                <div class="mechanism-topline"><span class="mechanism-number">05 / MECHANIC</span><span class="mechanism-tag">即時回饋</span></div>
+                <h3>讓結果立即可見</h3>
+                <div class="game-name">Phaser 範例：Stacker</div>
+                <p>方塊落下後，重疊的部分留下，沒對準的部分消失。每次行動都立刻改變下一回合的條件。</p>
+                <p class="learning-translation"><strong>學習轉譯</strong> 回答後立即指出哪些部分正確，並提供能支持下一次修正的提示。</p>
+              </div>
+              <div class="frame-heading"><span>掌握放置時機，向上堆疊</span><span>可操作範例</span></div>
+              <div class="frame-shell"><iframe class="phaser-frame" title="Stacker 方塊堆疊範例" data-example="src/games/stacker/stacker.js" data-module="false" loading="lazy" allow="fullscreen" referrerpolicy="no-referrer"></iframe></div>
+              <div class="frame-actions"><a class="open-example" href="#" target="_blank" rel="noreferrer">另開遊戲視窗 ↗</a><a href="https://github.com/phaserjs/examples" target="_blank" rel="noreferrer">範例來源 ↗</a></div>
+            </article>
+          </div>
+
+          <div class="col-lg-6">
+            <article class="mechanism-card">
+              <div class="mechanism-copy">
+                <div class="mechanism-topline"><span class="mechanism-number">06 / MECHANIC</span><span class="mechanism-tag">線索推理</span></div>
+                <h3>用線索建立推論</h3>
+                <div class="game-name">Phaser 範例：Minesweeper</div>
+                <p>格子上的數字代表周圍地雷數量。玩家逐步排除可能位置，依據證據決定下一步。</p>
+                <p class="learning-translation"><strong>學習轉譯</strong> 把資料或條件變成線索，要求學習者說明推論依據。</p>
+              </div>
+              <div class="frame-heading"><span>讀取數字，標記地雷</span><span>可操作範例</span></div>
+              <div class="frame-shell"><iframe class="phaser-frame" title="Minesweeper 線索推理範例" data-example="src/games/minesweeper/minesweeper.js" data-module="false" loading="lazy" allow="fullscreen" referrerpolicy="no-referrer"></iframe></div>
+              <div class="frame-actions"><a class="open-example" href="#" target="_blank" rel="noreferrer">另開遊戲視窗 ↗</a><a href="https://github.com/phaserjs/examples" target="_blank" rel="noreferrer">範例來源 ↗</a></div>
+            </article>
+          </div>
+
+          <div class="col-lg-6">
+            <article class="mechanism-card">
+              <div class="mechanism-copy">
+                <div class="mechanism-topline"><span class="mechanism-number">07 / MECHANIC</span><span class="mechanism-tag">步數限制</span></div>
+                <h3>在限制中安排策略</h3>
+                <div class="game-name">Phaser 範例：Flood Fill</div>
+                <p>玩家選擇顏色擴大連接區域，必須在步數用完前覆蓋整張棋盤。每次選擇都會改變後續空間。</p>
+                <p class="learning-translation"><strong>學習轉譯</strong> 加入有限步數或資源，讓解題者比較方案並預想長期效果。</p>
+              </div>
+              <div class="frame-heading"><span>用顏色擴展連通區域</span><span>可操作範例</span></div>
+              <div class="frame-shell"><iframe class="phaser-frame" title="Flood Fill 有限步數策略範例" data-example="src/games/flood fill/flood-fill.js" data-module="false" loading="lazy" allow="fullscreen" referrerpolicy="no-referrer"></iframe></div>
+              <div class="frame-actions"><a class="open-example" href="#" target="_blank" rel="noreferrer">另開遊戲視窗 ↗</a><a href="https://github.com/phaserjs/examples" target="_blank" rel="noreferrer">範例來源 ↗</a></div>
+            </article>
+          </div>
+
+          <div class="col-lg-6">
+            <article class="mechanism-card">
+              <div class="mechanism-copy">
+                <div class="mechanism-topline"><span class="mechanism-number">08 / MECHANIC</span><span class="mechanism-tag">風險取捨</span></div>
+                <h3>衡量收益與代價</h3>
+                <div class="game-name">Phaser 範例：My First Game</div>
+                <p>收集星星可以累積分數，碰到炸彈則會失去生命。玩家追求收益時，也得觀察敵人和可通行的路線。</p>
+                <p class="learning-translation"><strong>學習轉譯</strong> 在安全的模擬情境中比較選項，討論風險、收益和決策依據。</p>
+              </div>
+              <div class="frame-heading"><span>收集星星，避開炸彈</span><span>可操作範例</span></div>
+              <div class="frame-shell"><iframe class="phaser-frame" title="My First Game 風險取捨範例" data-direct="src/games/my first game/index.html" loading="lazy" allow="fullscreen" referrerpolicy="no-referrer"></iframe></div>
+              <div class="frame-actions"><a class="open-example" href="#" target="_blank" rel="noreferrer">另開遊戲視窗 ↗</a><a href="https://github.com/phaserjs/examples" target="_blank" rel="noreferrer">範例來源 ↗</a></div>
+            </article>
+          </div>
+
+          <div class="col-lg-6">
+            <article class="mechanism-card">
+              <div class="mechanism-copy">
+                <div class="mechanism-topline"><span class="mechanism-number">09 / MECHANIC</span><span class="mechanism-tag">路徑規劃</span></div>
+                <h3>根據局勢調整路線</h3>
+                <div class="game-name">Phaser 範例：Snake</div>
+                <p>蛇身會隨著吃到食物而變長，可行空間越來越少。玩家要同時看位置、方向和下一段路線。</p>
+                <p class="learning-translation"><strong>學習轉譯</strong> 用逐步變化的條件練習規劃、預測，以及依新資訊調整方案。</p>
+              </div>
+              <div class="frame-heading"><span>收集食物，避免碰撞</span><span>可操作範例</span></div>
+              <div class="frame-shell"><iframe class="phaser-frame" title="Snake 路徑規劃範例" data-example="src/games/snake/_part8.js" data-module="false" loading="lazy" allow="fullscreen" referrerpolicy="no-referrer"></iframe></div>
+              <div class="frame-actions"><a class="open-example" href="#" target="_blank" rel="noreferrer">另開遊戲視窗 ↗</a><a href="https://github.com/phaserjs/examples" target="_blank" rel="noreferrer">範例來源 ↗</a></div>
+            </article>
+          </div>
+
+          <div class="col-lg-6">
+            <article class="mechanism-card">
+              <div class="mechanism-copy">
+                <div class="mechanism-topline"><span class="mechanism-number">10 / MECHANIC</span><span class="mechanism-tag">角度預測</span></div>
+                <h3>預測碰撞並調整角度</h3>
+                <div class="game-name">Phaser 範例：Breakout</div>
+                <p>擋板接住小球的位置會改變反彈方向。玩家觀察球的軌跡，調整接球位置，嘗試擊中不同磚塊。</p>
+                <p class="learning-translation"><strong>學習轉譯</strong> 用可見的碰撞結果練習預測、觀察因果，再修正自己的判斷。</p>
+              </div>
+              <div class="frame-heading"><span>移動擋板，反彈小球</span><span>可操作範例</span></div>
+              <div class="frame-shell"><iframe class="phaser-frame" title="Breakout 角度預測與碰撞回饋範例" data-example="src/games/breakout/breakout.js" data-module="false" loading="lazy" allow="fullscreen" referrerpolicy="no-referrer"></iframe></div>
+              <div class="frame-actions"><a class="open-example" href="#" target="_blank" rel="noreferrer">另開遊戲視窗 ↗</a><a href="https://github.com/phaserjs/examples" target="_blank" rel="noreferrer">範例來源 ↗</a></div>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-pad design-section" id="design">
+      <div class="container">
+        <p class="section-kicker">03 / 從遊戲走向學習</p>
+        <h2 class="section-title">好玩的規則，也要指向學習</h2>
+        <p class="section-lead">設計機制時，先想學習者需要理解或練習什麼，再選能讓這種思考自然發生的玩法。</p>
+        <div class="row g-3 mt-4">
+          <div class="col-md-4"><article class="design-principle"><span>01</span><h3>對準學習目標</h3><p>每個任務都要讓玩家練到預期的概念或技能。</p></article></div>
+          <div class="col-md-4"><article class="design-principle"><span>02</span><h3>回饋要能解釋</h3><p>讓玩家知道答案如何影響結果，並看見修正方向。</p></article></div>
+          <div class="col-md-4"><article class="design-principle"><span>03</span><h3>留出反思時間</h3><p>在回合之間整理策略，連結遊戲經驗與真實情境。</p></article></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="closing" aria-labelledby="closing-title">
+      <div class="container">
+        <div class="closing-card">
+          <div>
+            <p class="section-kicker mb-2">帶著問題回到設計</p>
+            <h2 id="closing-title">下一個學習任務，可以怎麼玩？</h2>
+            <p>挑一個明確目標，選一種能引導思考的機制，安排清楚的回饋，再邀請學習者說明自己怎麼做出選擇。</p>
+          </div>
+          <a class="button-lime flex-shrink-0" href="#mechanisms">再看一次範例 <span class="ms-2" aria-hidden="true">↑</span></a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container d-flex flex-column flex-md-row justify-content-between gap-2">
+      <span>學習遊戲研究室　以互動範例探索遊戲式學習</span>
+      <span>研究參考 <a href="https://doi.org/10.1080/00461520.2015.1122533" target="_blank" rel="noreferrer">Plass、Homer 與 Kinzer，2015</a>　原始範例 <a href="https://github.com/phaserjs/examples" target="_blank" rel="noreferrer">Phaser 官方 GitHub</a></span>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+  <script>
+    function updateScrollbarCompensation() {
+      const width = Math.max(0, window.innerWidth - document.documentElement.clientWidth)
+      document.documentElement.style.setProperty('--scrollbar-compensation', `${width}px`)
+    }
+
+    updateScrollbarCompensation()
+    window.addEventListener('resize', updateScrollbarCompensation)
+
+    let activeFrame = null
+    let activeLaunch = null
+
+    document.querySelectorAll('.phaser-frame').forEach((frame) => {
+      const directExample = frame.dataset.direct
+      const localExample = frame.dataset.local
+      const viewer = localExample
+        ? new URL(localExample, window.location.href)
+        : directExample
+        ? new URL(`../phaser-examples/public/${directExample}`, window.location.href)
+        : new URL('../phaser-examples/public/phaser4-view.html', window.location.href)
+
+      if (!directExample && !localExample) {
+        viewer.searchParams.set('src', frame.dataset.example)
+        viewer.searchParams.set('v', '4.0.0')
+        viewer.searchParams.set('module', frame.dataset.module)
+      }
+
+      const launch = document.createElement('button')
+      launch.type = 'button'
+      launch.className = 'frame-launch'
+      launch.innerHTML = '<span>載入並遊玩</span><small>遊戲會在此區域開啟</small>'
+      frame.closest('.frame-shell').append(launch)
+
+      frame.addEventListener('load', () => {
+        if (frame.dataset.active !== 'true') return
+
+        if (localExample) {
+          launch.hidden = true
+          launch.disabled = false
+          return
+        }
+
+        try {
+          const compactView = frame.contentDocument.createElement('style')
+          compactView.textContent = directExample ? `
+            html, body { width: 100% !important; height: 100% !important; min-width: 0 !important; margin: 0 !important; overflow: hidden !important; }
+            body { background: #152a27 !important; }
+            canvas { display: block !important; max-width: 100% !important; width: 100% !important; height: auto !important; }
+          ` : `
+            html, body { width: 100% !important; min-width: 0 !important; margin: 0 !important; overflow: hidden !important; }
+            body.viewer-page { background: #152a27 !important; }
+            .viewer-header, .viewer-controls, #source-modal { display: none !important; }
+            .viewer-content { max-width: none !important; margin: 0 !important; padding: 0 !important; }
+            .example-container { margin: 0 !important; padding: 0 !important; border: 0 !important; border-radius: 0 !important; background: transparent !important; box-shadow: none !important; backdrop-filter: none !important; }
+            .phaser-example { width: 100% !important; min-height: 0 !important; height: auto !important; border-radius: 0 !important; }
+            .phaser-example canvas { display: block !important; max-width: 100% !important; width: auto !important; height: auto !important; }
+          `
+          frame.contentDocument.head.append(compactView)
+        } catch (error) {
+          frame.title = `${frame.title} 請使用另開遊戲視窗`
+        }
+
+        const loadingStarted = Date.now()
+        const revealWhenReady = () => {
+          if (frame.dataset.active !== 'true') return
+          if (frame.contentDocument.querySelector('canvas')) {
+            launch.hidden = true
+            launch.disabled = false
+            return
+          }
+          if (Date.now() - loadingStarted > 15000) {
+            launch.disabled = false
+            launch.querySelector('span').textContent = '載入較慢，點擊重試'
+            launch.querySelector('small').textContent = '遊戲會在本頁重新載入'
+            return
+          }
+          window.setTimeout(revealWhenReady, 250)
+        }
+        revealWhenReady()
+      })
+
+      const openLink = frame.closest('.mechanism-card').querySelector('.open-example')
+      openLink.href = viewer.href
+
+      launch.addEventListener('click', () => {
+        if (activeFrame === frame) {
+          launch.disabled = true
+          launch.querySelector('span').textContent = '正在載入遊戲'
+          launch.querySelector('small').textContent = '載入完成後即可開始'
+          frame.dataset.active = 'false'
+          frame.src = 'about:blank'
+          window.setTimeout(() => {
+            if (activeFrame === frame) {
+              frame.dataset.active = 'true'
+              frame.src = viewer.href
+            }
+          }, 120)
+          return
+        }
+
+        if (activeFrame) {
+          activeFrame.dataset.active = 'false'
+          activeFrame.src = 'about:blank'
+          activeLaunch.hidden = false
+          activeLaunch.disabled = false
+          activeLaunch.querySelector('span').textContent = '載入並遊玩'
+          activeLaunch.querySelector('small').textContent = '遊戲會在此區域開啟'
+        }
+
+        activeFrame = frame
+        activeLaunch = launch
+        frame.dataset.active = 'true'
+        launch.disabled = true
+        launch.querySelector('span').textContent = '正在載入遊戲'
+        launch.querySelector('small').textContent = '載入完成後即可開始'
+        frame.src = viewer.href
+      })
+    })
+
+    document.querySelectorAll('#mainNav .nav-link, #mainNav .nav-cta').forEach((link) => {
+      link.addEventListener('click', () => {
+        const menu = document.getElementById('mainNav')
+        if (menu.classList.contains('show') && window.bootstrap) {
+          window.bootstrap.Collapse.getOrCreateInstance(menu).hide()
+        }
+      })
+    })
+  </script>
+</body>
+</html>
